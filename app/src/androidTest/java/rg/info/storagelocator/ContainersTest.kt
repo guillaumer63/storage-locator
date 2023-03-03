@@ -14,7 +14,6 @@ class ContainersTest {
         val containers = Containers(context)
         val container1 = Container("test", "desc", "loc")
 
-
         assert(container1.description == "desc")
         assert(container1.location == "loc")
 
