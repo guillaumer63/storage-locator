@@ -3,8 +3,8 @@ package rg.info.storagelocator
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import  org.junit.Test
-import rg.info.storagelocator.data.Container
 import rg.info.storagelocator.data.Containers
+import rg.info.storagelocator.data.model.Container
 import java.util.UUID
 
 class ContainersTest {
@@ -23,7 +23,7 @@ class ContainersTest {
         containers.getContainers()[0].addItem("pen")
         assert(containers.getContainers()[0].getItems().size == 1)
 
-        containers.getContainer(container1.uuid)?.removeItem("pen")
+        containers.getContainer(container1.getUUID())?.removeItem("pen")
         assert(containers.getContainers()[0].getItems().isEmpty())
 
         val uuid = UUID.randomUUID()
@@ -31,7 +31,7 @@ class ContainersTest {
         containers.addContainer(container2, context)
 
         // Elvis operator: if the left side is not null, return it, otherwise return the right side
-        assert((containers.getContainer(uuid)?.uuid ?: UUID.randomUUID()) == uuid)
+        assert((containers.getContainer(uuid)?.getUUID() ?: UUID.randomUUID()) == uuid)
 
         containers.removeContainer("test", context)
         containers.removeContainer("test2", context)

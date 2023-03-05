@@ -2,62 +2,47 @@ package rg.info.storagelocator.data
 
 import android.content.Context
 import com.google.gson.Gson
+import rg.info.storagelocator.data.model.Container
 import java.util.UUID
-
-class Container(
-    val name: String,
-    val description: String,
-    val location: String,
-    val uuid: UUID = UUID.randomUUID()
-) {
-    private var items: List<String> = listOf()
-
-    fun addItem(item: String) {
-        items = items.plus(item)
-    }
-
-    fun removeItem(item: String) {
-        items = items.minus(item)
-    }
-
-    fun getItems(): List<String> {
-        return items
-    }
-
-    fun getUUID(): UUID {
-        return uuid
-    }
-}
 
 class Containers(context: Context) {
     private var containers: List<Container> = listOf()
 
+    // at instantiation
     init {
         // load the containers from the shared preferences
-        loadContainers(context)
+        this.loadContainers(context)
+        this.deleteAllContainers()
+        this.generateRandomContainers()
+        this.storeContainers(context)
     }
 
     // checks if the container with the same name or UUID already exists
     fun addContainer(container: Container, context: Context) {
+        // if the container with the same name or UUID already exists, throw an exception
         if (containers.any() { it.name == container.name })
             throw Exception("Container with name ${container.name} already exists")
         else if (containers.any() { it.getUUID() == container.getUUID() })
             throw Exception("Container with UUID ${container.getUUID()} already exists")
 
         containers = containers.plus(container)
-        storeContainers(context)
+        this.storeContainers(context)
+
+        // todo: add a check if the container with the same name or UUID already exists in the activity
+        // and display a toast message
     }
 
+    // removes first container with the specified name
     fun removeContainer(containerName: String, context: Context) {
         containers = containers.minus(containers.first() { it.name == containerName })
-        storeContainers(context)
+        this.storeContainers(context)
     }
 
     fun getContainers(): List<Container> {
         return containers
     }
 
-    // Function that returns a container by its UUID
+    // Function that returns a container by its UUID, or null
     fun getContainer(uuid: UUID): Container? {
         return containers.firstOrNull() { it.getUUID() == uuid }
     }
@@ -73,6 +58,7 @@ class Containers(context: Context) {
         editor.apply()
     }
 
+    // Function that loads the list of containers from the shared preferences
     private fun loadContainers(context: Context) {
         val sharedPref = context.getSharedPreferences(
             "storage-locator", Context.MODE_PRIVATE
@@ -81,5 +67,25 @@ class Containers(context: Context) {
         val jsonString = sharedPref.getString("containers", null) ?: return
         val containers = Gson().fromJson(jsonString, Array<Container>::class.java).toList()
         this.containers = containers
+    }
+
+    fun deleteAllContainers() {
+        containers = listOf()
+    }
+
+    // Function that generates a list of containers for testing purposes
+    private fun generateRandomContainers() {
+        for (i in 1..26) {
+            containers = containers.plus(
+                Container(
+                    "Conteneur $i",
+                    "Description $i",
+                    "Location $i"
+                )
+            )
+            for (j in 1..5) {
+                containers[i - 1].addItem("Item $j")
+            }
+        }
     }
 }
