@@ -41,10 +41,11 @@ fun StorageLocatorApp() {
     val navController = rememberNavController()
 
     StorageLocatorTheme {
-
+        // Scaffold is a layout component that provides a top app bar and a bottom navigation bar
         Scaffold(
-            topBar = { TopAppBar(title = { Text(text = "Storage Locator") }) },
+            topBar = { TopAppBar(title = { Text(text = "Storage Locator") }) }
         ) { padding ->
+            // Surface is a layout component that provides a background color
             Surface(
                 modifier = Modifier
                     .fillMaxSize()
@@ -54,18 +55,20 @@ fun StorageLocatorApp() {
                     navController = navController,
                     startDestination = Screen.Home.route,
                 ) {
+                    // Home Screen
                     composable(
                         route = Screen.Home.route
                     ) {
                         HomeScreen(navController = navController)
                     }
 
+                    // Container Screen
                     composable(
                         route = Screen.Container.route + "/{uuid}",
                         // we are passing the uuid as a parameter to the ContainerScreen
                         arguments = listOf(
                             navArgument("uuid") {
-                                // the argument is a string, default value is a random uuid
+                                // the argument is a string so the default value is a random uuid
                                 type = NavType.StringType
                                 defaultValue = Containers.getRandomUUID().toString()
                             }

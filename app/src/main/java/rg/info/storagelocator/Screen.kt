@@ -8,6 +8,6 @@ sealed interface Screen {
     }
 
     object Container : Screen {
-        override val route: String = "search"
+        override val route: String = "container"
     }
 }

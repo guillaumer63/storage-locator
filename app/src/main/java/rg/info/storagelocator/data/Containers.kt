@@ -26,8 +26,8 @@ object Containers {
     }
 
     // removes first container with the specified name
-    fun removeContainer(containerName: String, context: Context) {
-        this.containers = this.containers.minus(this.containers.first { it.name == containerName })
+    fun removeContainer(uuid: UUID, context: Context) {
+        this.containers = this.containers.minus(this.containers.first { it.getUUID() == uuid })
         this.storeContainers(context)
     }
 
