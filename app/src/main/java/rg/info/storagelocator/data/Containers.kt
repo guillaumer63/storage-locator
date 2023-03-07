@@ -5,51 +5,55 @@ import com.google.gson.Gson
 import rg.info.storagelocator.data.model.Container
 import java.util.UUID
 
-class Containers(context: Context) {
+object Containers {
     private var containers: List<Container> = listOf()
 
-    // at instantiation
     init {
-        // load the containers from the shared preferences
-        this.loadContainers(context)
-        this.deleteAllContainers()
-        this.generateRandomContainers()
-        this.storeContainers(context)
+        deleteAllContainers()
+        generateRandomContainers()
     }
 
     // checks if the container with the same name or UUID already exists
     fun addContainer(container: Container, context: Context) {
         // if the container with the same name or UUID already exists, throw an exception
-        if (containers.any() { it.name == container.name })
+        if (this.containers.any { it.name == container.name })
             throw Exception("Container with name ${container.name} already exists")
-        else if (containers.any() { it.getUUID() == container.getUUID() })
+        else if (this.containers.any { it.getUUID() == container.getUUID() })
             throw Exception("Container with UUID ${container.getUUID()} already exists")
 
-        containers = containers.plus(container)
+        this.containers = this.containers.plus(container)
         this.storeContainers(context)
-
-        // todo: add a check if the container with the same name or UUID already exists in the activity
-        // and display a toast message
     }
 
     // removes first container with the specified name
     fun removeContainer(containerName: String, context: Context) {
-        containers = containers.minus(containers.first() { it.name == containerName })
+        this.containers = this.containers.minus(this.containers.first { it.name == containerName })
         this.storeContainers(context)
     }
 
     fun getContainers(): List<Container> {
-        return containers
+        return this.containers
     }
 
     // Function that returns a container by its UUID, or null
     fun getContainer(uuid: UUID): Container? {
-        return containers.firstOrNull() { it.getUUID() == uuid }
+        return this.containers.firstOrNull { it.getUUID() == uuid }
+    }
+
+    // Function that returns a random UUID that is not used by any container
+    fun getRandomUUID(): UUID {
+        val uuid = UUID.randomUUID()
+
+        return if (this.containers.any { it.getUUID() == uuid }) {
+            getRandomUUID()
+        } else {
+            uuid
+        }
     }
 
     // Function that stores the list of containers in the shared preferences
     private fun storeContainers(context: Context) {
-        val jsonString = Gson().toJson(containers)
+        val jsonString = Gson().toJson(this.containers)
         val sharedPref = context.getSharedPreferences(
             "storage-locator", Context.MODE_PRIVATE
         )
@@ -59,7 +63,7 @@ class Containers(context: Context) {
     }
 
     // Function that loads the list of containers from the shared preferences
-    private fun loadContainers(context: Context) {
+    fun loadContainers(context: Context) {
         val sharedPref = context.getSharedPreferences(
             "storage-locator", Context.MODE_PRIVATE
         )
@@ -70,21 +74,22 @@ class Containers(context: Context) {
     }
 
     fun deleteAllContainers() {
-        containers = listOf()
+        this.containers = listOf()
     }
 
     // Function that generates a list of containers for testing purposes
     private fun generateRandomContainers() {
-        for (i in 1..26) {
-            containers = containers.plus(
+        for (i in 1..20) {
+            this.containers = this.containers.plus(
                 Container(
                     "Conteneur $i",
                     "Description $i",
-                    "Location $i"
+                    "Location $i",
+                    this.getRandomUUID()
                 )
             )
             for (j in 1..5) {
-                containers[i - 1].addItem("Item $j")
+                this.containers[i - 1].addItem("Item $j")
             }
         }
     }

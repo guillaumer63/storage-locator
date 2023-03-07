@@ -1,4 +1,4 @@
-package rg.info.storagelocator.components.container
+package rg.info.storagelocator.ui.screens
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
@@ -16,20 +16,32 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import rg.info.storagelocator.Screen
+import rg.info.storagelocator.data.Containers
+import rg.info.storagelocator.data.model.Container
 import rg.info.storagelocator.ui.theme.StorageLocatorTheme
 import java.util.UUID
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateComponent() {
-    val (containerName, onContainerNameChange) = remember { mutableStateOf("") }
-    val (containerDescription, onContainerDescriptionChange) = remember { mutableStateOf("") }
-    val (containerLocation, onContainerLocationChange) = remember { mutableStateOf("") }
+fun ContainerScreen(uuid: UUID, navController: NavController) {
+    // loading container from the containers
+    var container = Containers.getContainer(uuid)
+    // if container is null, we are creating a new container with a random UUID
+    if (container == null) {
+        container = Container("", "", "", Containers.getRandomUUID())
+    }
 
-    val uuid: UUID = UUID.randomUUID()
+    val context = LocalContext.current
+
+    val (containerName, onContainerNameChange) = remember { mutableStateOf(container.name) }
+    val (containerDescription, onContainerDescriptionChange) = remember { mutableStateOf(container.description) }
+    val (containerLocation, onContainerLocationChange) = remember { mutableStateOf(container.location) }
 
     Column(
         verticalArrangement = Arrangement.Top,
@@ -83,10 +95,17 @@ fun CreateComponent() {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceAround
         ) {
-            Button(onClick = { /*TODO*/ }) {
-                Text("Ajouter")
+            Button(onClick = {
+                container.name = containerName
+                container.description = containerDescription
+                container.location = containerLocation
+
+                Containers.addContainer(container, context)
+                navController.navigate(Screen.Home.route)
+            }) {
+                Text("Enregistrer")
             }
-            OutlinedButton(onClick = { /*TODO*/ }) {
+            OutlinedButton(onClick = { navController.navigate(Screen.Home.route) }) {
                 Text("Annuler")
             }
         }
@@ -98,7 +117,10 @@ fun CreateComponent() {
 @Composable
 fun CreateComponentPreview() {
     StorageLocatorTheme {
-        CreateComponent()
+        ContainerScreen(
+            uuid = Containers.getRandomUUID(),
+            navController = NavController(LocalContext.current)
+        )
     }
 }
 
@@ -107,6 +129,9 @@ fun CreateComponentPreview() {
 @Composable
 fun CreateComponentPreviewDark() {
     StorageLocatorTheme {
-        CreateComponent()
+        ContainerScreen(
+            uuid = Containers.getRandomUUID(),
+            navController = NavController(LocalContext.current)
+        )
     }
 }

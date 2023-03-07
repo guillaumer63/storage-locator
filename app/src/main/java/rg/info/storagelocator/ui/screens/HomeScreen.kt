@@ -1,4 +1,4 @@
-package rg.info.storagelocator.components.home
+package rg.info.storagelocator.ui.screens
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -20,20 +21,40 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import rg.info.storagelocator.Screen
+import rg.info.storagelocator.data.Containers
+import rg.info.storagelocator.ui.components.ListComponent
 import rg.info.storagelocator.ui.theme.StorageLocatorTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeComponent() {
+fun HomeScreen(navController: NavController) {
+    Containers.loadContainers(LocalContext.current)
+
     val (search, onSearchChange) = remember { mutableStateOf("") }
 
     Column(
         verticalArrangement = Arrangement.Top
     ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Button(onClick = {
+                // accessing the container screen
+                navController.navigate(
+                    Screen.Container.route + "/${Containers.getRandomUUID()}"
+                )
+            }) {
+                Text(text = "Ajouter un conteneur")
+            }
+        }
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
@@ -54,7 +75,7 @@ fun HomeComponent() {
                 )
             )
         }
-        ContainerListComponent()
+        ListComponent(navController = navController)
     }
 }
 
@@ -62,7 +83,7 @@ fun HomeComponent() {
 @Composable
 fun HomePreview() {
     StorageLocatorTheme {
-        HomeComponent()
+        HomeScreen(navController = NavController(LocalContext.current))
     }
 }
 
@@ -71,6 +92,6 @@ fun HomePreview() {
 @Composable
 fun HomePreviewDark() {
     StorageLocatorTheme {
-        HomeComponent()
+        HomeScreen(navController = NavController(LocalContext.current))
     }
 }

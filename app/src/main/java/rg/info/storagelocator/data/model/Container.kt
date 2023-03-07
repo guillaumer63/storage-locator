@@ -6,8 +6,7 @@ class Container(
     var name: String,
     var description: String,
     var location: String,
-    private var uuid: UUID = UUID.randomUUID()
-    // 2 constructors are created, one with the UUID and one without
+    private var uuid: UUID
 ) {
     private var items: List<String> = listOf()
 

@@ -1,6 +1,5 @@
-package rg.info.storagelocator.components.home
+package rg.info.storagelocator.ui.components
 
-import android.content.Context
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,16 +20,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import rg.info.storagelocator.Screen
 import rg.info.storagelocator.data.Containers
 import rg.info.storagelocator.ui.theme.StorageLocatorTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ContainerListComponent() {
-    val context: Context = LocalContext.current
-
+fun ListComponent(navController: NavController) {
     // loading containers from the shared preferences
-    val containers = Containers(context)
+
+//    print containers
 
     Column(
         modifier = Modifier
@@ -42,12 +42,15 @@ fun ContainerListComponent() {
             .padding(16.dp)
     ) {
 
-        for (container in containers.getContainers()) {
+        for (container in Containers.getContainers()) {
             ListItem(
                 headlineText = { Text(text = container.name) },
                 trailingContent = {
                     IconButton(onClick = {
-                        // list all the items in the container
+                        // accessing the container screen
+                        navController.navigate(
+                            Screen.Container.route + "/${container.getUUID()}"
+                        )
 
                     }) {
                         Icon(
@@ -57,8 +60,8 @@ fun ContainerListComponent() {
                     }
                 }
             )
+            Divider()
         }
-        Divider()
     }
 }
 
@@ -67,7 +70,7 @@ fun ContainerListComponent() {
 @Composable
 fun ContainerListComponentLightPreview() {
     StorageLocatorTheme {
-        ContainerListComponent()
+        ListComponent(navController = NavController(LocalContext.current))
     }
 }
 
@@ -75,6 +78,6 @@ fun ContainerListComponentLightPreview() {
 @Composable
 fun ContainerListComponentDarkPreview() {
     StorageLocatorTheme {
-        ContainerListComponent()
+        ListComponent(navController = NavController(LocalContext.current))
     }
 }
