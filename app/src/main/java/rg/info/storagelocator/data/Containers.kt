@@ -90,7 +90,7 @@ object Containers {
 
     // Function that generates a list of containers for testing purposes
     private fun generateRandomContainers() {
-        for (i in 1..20) {
+        for (i in 1..100) {
             this.containers = this.containers.plus(
                 Container(
                     "Conteneur $i",

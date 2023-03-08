@@ -1,5 +1,6 @@
 package rg.info.storagelocator.ui.components
 
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -16,11 +17,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanOptions
 import rg.info.storagelocator.Screen
 import rg.info.storagelocator.data.Containers
 
 @Composable
 fun HomeFABComponent(navController: NavController) {
+    // Scan QR code
+    val scanLauncher = rememberLauncherForActivityResult(
+        contract = ScanContract(),
+        onResult = { result -> navController.navigate(Screen.Container.route + "/${result.contents}") }
+    )
+
     Column(
         horizontalAlignment = Alignment.End,
         verticalArrangement = Arrangement.SpaceBetween,
@@ -28,7 +37,9 @@ fun HomeFABComponent(navController: NavController) {
     ) {
 
         FloatingActionButton(
-            onClick = { /*TODO*/ },
+            onClick = {
+                scanLauncher.launch(ScanOptions())
+            },
             content = {
                 Icon(Icons.Filled.QrCodeScanner, contentDescription = "Search")
             },

@@ -23,7 +23,7 @@ class ContainersTest {
         assert(container1.description == "desc")
         assert(container1.location == "loc")
 
-        Containers.addContainer(container1, context)
+        Containers.saveContainer(container1, context)
         assert(Containers.getContainers().size == 1)
 
         Containers.getContainers()[0].addItem("pen")
@@ -34,13 +34,13 @@ class ContainersTest {
 
         val uuid = UUID.randomUUID()
         val container2 = Container("test2", "test2", "test2", uuid)
-        Containers.addContainer(container2, context)
+        Containers.saveContainer(container2, context)
 
         // Elvis operator: if the left side is not null, return it, otherwise return the right side
         assert((Containers.getContainer(uuid)?.getUUID() ?: UUID.randomUUID()) == uuid)
 
-        Containers.removeContainer("test", context)
-        Containers.removeContainer("test2", context)
+        Containers.removeContainer(container1.getUUID(), context)
+        Containers.removeContainer(container2.getUUID(), context)
         assert(Containers.getContainers().isEmpty())
         Containers.deleteAllContainers()
     }

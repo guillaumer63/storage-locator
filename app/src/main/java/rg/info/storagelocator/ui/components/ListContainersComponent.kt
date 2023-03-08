@@ -36,7 +36,8 @@ fun ListComponent(navController: NavController) {
             .padding(16.dp)
     ) {
         // we use the items function to iterate over the list of containers
-        items(Containers.getContainers()) { container ->
+        items(Containers.getContainers(),
+            key = { container -> container.getUUID() }) { container ->
             ListItem(
                 headlineText = { Text(text = container.name) },
                 modifier = Modifier.clickable {
