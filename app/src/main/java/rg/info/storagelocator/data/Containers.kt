@@ -6,29 +6,40 @@ import rg.info.storagelocator.data.model.Container
 import java.util.UUID
 
 object Containers {
-    private var containers: List<Container> = listOf()
+    private var containers: List<Container> = emptyList()
 
     init {
         deleteAllContainers()
         generateRandomContainers()
     }
 
-    // checks if the container with the same name or UUID already exists
-    fun addContainer(container: Container, context: Context) {
-        // if the container with the same name or UUID already exists, throw an exception
-        if (this.containers.any { it.name == container.name })
-            throw Exception("Container with name ${container.name} already exists")
-        else if (this.containers.any { it.getUUID() == container.getUUID() })
-            throw Exception("Container with UUID ${container.getUUID()} already exists")
-
+    // adds or updates a container
+    fun saveContainer(container: Container, context: Context) {
+        //
+        if (this.containers.any { it.getUUID() == container.getUUID() }) {
+            this.updateContainer(container)
+            this.storeContainers(context)
+            return
+        }
         this.containers = this.containers.plus(container)
         this.storeContainers(context)
     }
 
-    // removes first container with the specified name
+    private fun updateContainer(container: Container) {
+        this.containers.first { it.getUUID() == container.getUUID() }.name = container.name
+        this.containers.first { it.getUUID() == container.getUUID() }.description =
+            container.description
+        this.containers.first { it.getUUID() == container.getUUID() }.location =
+            container.location
+
+    }
+
+    // removes first container with the specified name else, do nothing
     fun removeContainer(uuid: UUID, context: Context) {
-        this.containers = this.containers.minus(this.containers.first { it.getUUID() == uuid })
-        this.storeContainers(context)
+        if (this.containers.any { it.getUUID() == uuid }) {
+            this.containers = this.containers.minus(this.containers.first { it.getUUID() == uuid })
+            this.storeContainers(context)
+        }
     }
 
     fun getContainers(): List<Container> {
@@ -74,7 +85,7 @@ object Containers {
     }
 
     fun deleteAllContainers() {
-        this.containers = listOf()
+        this.containers = emptyList()
     }
 
     // Function that generates a list of containers for testing purposes

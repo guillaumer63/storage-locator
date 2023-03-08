@@ -8,7 +8,7 @@ class Container(
     var location: String,
     private var uuid: UUID
 ) {
-    private var items: List<String> = listOf()
+    private var items: List<String> = emptyList()
 
     fun addItem(item: String) {
         items = items.plus(item)
