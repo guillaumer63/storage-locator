@@ -16,12 +16,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import rg.info.storagelocator.Screen
 import rg.info.storagelocator.data.Containers
 import rg.info.storagelocator.data.model.Container
 import java.util.UUID
 
 @Composable
-fun ContainerFABComponent(uuid: UUID) {
+fun ContainerFABComponent(navController: NavController, uuid: UUID) {
     val addDialog = remember { mutableStateOf(false) }
     var container = Containers.getContainer(uuid)
     if (container == null) {
@@ -46,6 +48,8 @@ fun ContainerFABComponent(uuid: UUID) {
                     onClick = {
                         container.addItem(newItemName)
                         addDialog.value = false
+                        // refresh container
+                        navController.navigate(Screen.Container.route + "/${uuid}")
                     },
                     // green color
                     colors = ButtonDefaults.buttonColors(

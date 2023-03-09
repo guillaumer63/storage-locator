@@ -16,11 +16,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import rg.info.storagelocator.data.Containers
@@ -61,9 +63,16 @@ fun HomeScreen(navController: NavController) {
                             }
                         },
                         placeholder = { Text(text = "Objet") },
-                        shape = RoundedCornerShape(40)
+                        shape = RoundedCornerShape(40),
+                        // hide underline
+                        colors = TextFieldDefaults.textFieldColors(
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            disabledIndicatorColor = Color.Transparent,
+                        )
                     )
                 }
+                // if search is empty, we display all containers
                 if (search.isEmpty())
                     ListComponent(Containers.getContainers(), navController = navController)
                 else
