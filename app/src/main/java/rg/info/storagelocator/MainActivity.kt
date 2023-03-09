@@ -1,6 +1,5 @@
 package rg.info.storagelocator
 
-import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,11 +8,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -42,9 +38,7 @@ fun StorageLocatorApp() {
 
     StorageLocatorTheme {
         // Scaffold is a layout component that provides a top app bar and a bottom navigation bar
-        Scaffold(
-            topBar = { TopAppBar(title = { Text(text = "Storage Locator") }) }
-        ) { padding ->
+        Scaffold { padding ->
             // Surface is a layout component that provides a background color
             Surface(
                 modifier = Modifier
@@ -55,6 +49,7 @@ fun StorageLocatorApp() {
                     navController = navController,
                     startDestination = Screen.Home.route,
                 ) {
+
                     // Home Screen
                     composable(
                         route = Screen.Home.route
@@ -67,8 +62,8 @@ fun StorageLocatorApp() {
                         route = Screen.Container.route + "/{uuid}",
                         // we are passing the uuid as a parameter to the ContainerScreen
                         arguments = listOf(
+                            // we are creating uuid, which is a string, as a navArgument
                             navArgument("uuid") {
-                                // the argument is a string so the default value is a random uuid
                                 type = NavType.StringType
                                 defaultValue = Containers.getRandomUUID().toString()
                             }
@@ -83,16 +78,4 @@ fun StorageLocatorApp() {
             }
         }
     }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
-@Composable
-fun RootComponentLightPreview() {
-    StorageLocatorApp()
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun RootComponentDarkPreview() {
-    StorageLocatorApp()
 }
