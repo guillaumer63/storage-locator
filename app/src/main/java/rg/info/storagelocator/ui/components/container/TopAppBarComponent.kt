@@ -23,27 +23,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import rg.info.storagelocator.Screen
 import rg.info.storagelocator.data.Containers
-import rg.info.storagelocator.data.model.Container
 import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopAppBarComponent(uuid: UUID, navController: NavController) {
+fun TopAppBarComponent(uuid: UUID, navigateToHome: () -> Unit, navigateAfterDelete: () -> Unit) {
     val editDialog = remember { mutableStateOf(false) }
     val deleteComponentDialog = remember { mutableStateOf(false) }
-    var container = Containers.getContainer(uuid)
+    val container = Containers.getContainer(uuid)
 
-    // if container is null, we are creating a new container with a random UUID
-    if (container == null) {
-        container = Container("Conteneur", "", "", Containers.getRandomUUID())
+    val (containerName, onContainerNameChange) = remember {
+        mutableStateOf(container.name)
     }
-
-    val (containerName, onContainerNameChange) = remember { mutableStateOf(container.name) }
-    val (containerDescription, onContainerDescriptionChange) = remember { mutableStateOf(container.description) }
-    val (containerLocation, onContainerLocationChange) = remember { mutableStateOf(container.location) }
+    val (containerDescription, onContainerDescriptionChange) = remember {
+        mutableStateOf(container.description)
+    }
+    val (containerLocation, onContainerLocationChange) = remember {
+        mutableStateOf(container.location)
+    }
     val context = LocalContext.current
 
     if (editDialog.value) {
@@ -124,7 +122,7 @@ fun TopAppBarComponent(uuid: UUID, navController: NavController) {
                 Button(
                     onClick = {
                         Containers.removeContainer(container.getUUID(), context)
-                        navController.popBackStack()
+                        navigateAfterDelete()
                     },
                     // red color
                     colors = ButtonDefaults.buttonColors(
@@ -153,7 +151,7 @@ fun TopAppBarComponent(uuid: UUID, navController: NavController) {
     TopAppBar(
         title = { Text(container.name) },
         navigationIcon = {
-            IconButton(onClick = { navController.navigate(Screen.Home.route) }) {
+            IconButton(onClick = { navigateToHome() }) {
                 Icon(Icons.Filled.Close, contentDescription = "Back")
             }
         },
@@ -161,9 +159,7 @@ fun TopAppBarComponent(uuid: UUID, navController: NavController) {
             IconButton(onClick = { editDialog.value = true }) {
                 Icon(Icons.Filled.Edit, contentDescription = "Edit")
             }
-            IconButton(onClick = {
-                deleteComponentDialog.value = true
-            }) {
+            IconButton(onClick = { deleteComponentDialog.value = true }) {
                 Icon(Icons.Filled.Delete, contentDescription = "Delete")
             }
             IconButton(onClick = {
@@ -172,7 +168,7 @@ fun TopAppBarComponent(uuid: UUID, navController: NavController) {
                 container.location = containerLocation
 
                 Containers.saveContainer(container, context)
-                navController.navigate(Screen.Home.route)
+                navigateToHome()
             }) {
                 Icon(Icons.Filled.Save, contentDescription = "Save")
             }

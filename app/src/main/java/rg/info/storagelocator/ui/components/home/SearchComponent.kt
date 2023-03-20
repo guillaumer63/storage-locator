@@ -1,26 +1,37 @@
 package rg.info.storagelocator.ui.components.home
 
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavController
+import androidx.compose.ui.tooling.preview.Preview
 import rg.info.storagelocator.data.Containers
 import rg.info.storagelocator.data.model.Container
+import java.util.UUID
 
 @Composable
-fun SearchComponent(search: String, navController: NavController) {
-    val containersToShow = searchContainers(search)
-    ListComponent(containersToShow, navController)
+fun SearchComponent(
+    search: String,
+    navigateToContainer: (containerUUID: UUID) -> Unit
+) {
+    val containers: List<Container> =
+        if (search.isEmpty())
+            Containers.getContainers()
+        else
+            searchContainers(search)
+
+    ListComponent(
+        containers = containers,
+        navigateToContainer = navigateToContainer
+    )
 }
 
+/* The list of containers is filtered based on the search query.
+     The search query is compared with :
+     1. The name of the container
+     2. The name of the items in the container
+     3. The name of the container using the levenshtein distance algorithm
+     4. The name of the items in the container using the levenshtein distance algorithm
+ */
 fun searchContainers(search: String): List<Container> {
     var containersToShow = emptyList<Container>()
-    // create a empty list of containers
-
-    // The list of containers is filtered based on the search query.
-    // The search query is compared with :
-    // 1. The name of the container
-    // 2. The name of the items in the container
-    // 3. The name of the container using the levenshtein distance algorithm
-    // 4. The name of the items in the container using the levenshtein distance algorithm
     containersToShow = containersToShow.plus(Containers.getContainers().filter {
         it.name.contains(search, true)
                 || it.getItems().any { item -> item.contains(search, true) }
@@ -47,4 +58,13 @@ fun levenshteinDistanceSimilar(s: String, t: String): Boolean {
         }
     }
     return d[s.length][t.length] <= s.length * 0.9
+}
+
+@Preview
+@Composable
+fun SearchComponentPreview() {
+    SearchComponent(
+        search = "",
+        navigateToContainer = {}
+    )
 }

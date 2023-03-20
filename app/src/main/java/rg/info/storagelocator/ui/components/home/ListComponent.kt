@@ -16,13 +16,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import rg.info.storagelocator.Screen
 import rg.info.storagelocator.data.model.Container
+import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListComponent(containers: List<Container>, navController: NavController) {
+fun ListComponent(
+    containers: List<Container>,
+    navigateToContainer: (containerUUID: UUID) -> Unit
+) {
     // this lazy column is used to display the list of containers
     // since there are a lot of containers, we use a lazy column
     LazyColumn(
@@ -38,7 +40,7 @@ fun ListComponent(containers: List<Container>, navController: NavController) {
                 headlineText = { Text(text = container.name) },
                 modifier = Modifier.clickable {
                     // Navigate to the container screen when clicked
-                    navController.navigate(Screen.Container.route + "/${container.getUUID()}")
+                    navigateToContainer(container.getUUID())
                 },
                 trailingContent = {
                     Icon(

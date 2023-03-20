@@ -1,13 +1,8 @@
 package rg.info.storagelocator
 
-sealed interface Screen {
-    val route: String
-
-    object Home : Screen {
-        override val route: String = "home"
-    }
-
-    object Container : Screen {
-        override val route: String = "container"
+sealed class Screen(val route: String) {
+    object Home : Screen("home")
+    object Container : Screen("container") {
+        fun createRoute(containerId: String) = "$route/$containerId"
     }
 }

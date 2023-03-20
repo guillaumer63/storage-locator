@@ -26,7 +26,8 @@ class Container(
     fun updateItem(oldItem: String, newItem: String) {
         val index = items.indexOf(oldItem)
         // replace the old item with the new one
-        items = items.toMutableList().apply { set(index, newItem) }
+        if (index != -1)
+            items = items.toMutableList().apply { set(index, newItem) }
     }
 
     fun getItems(): List<String> {

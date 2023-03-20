@@ -10,11 +10,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavType
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import rg.info.storagelocator.data.Containers
 import rg.info.storagelocator.ui.screens.ContainerScreen
 import rg.info.storagelocator.ui.screens.HomeScreen
@@ -32,46 +32,45 @@ class MainActivity : ComponentActivity() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Preview
 @Composable
 fun StorageLocatorApp() {
-    val navController = rememberNavController()
-
     StorageLocatorTheme {
-        // Scaffold is a layout component that provides a top app bar and a bottom navigation bar
+        val navController = rememberNavController()
+        Containers.loadContainers(LocalContext.current)
+
         Scaffold { padding ->
-            // Surface is a layout component that provides a background color
             Surface(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(padding),
+                    .padding(padding)
             ) {
                 NavHost(
                     navController = navController,
-                    startDestination = Screen.Home.route,
+                    startDestination = Screen.Home.route
                 ) {
-
-                    // Home Screen
-                    composable(
-                        route = Screen.Home.route
-                    ) {
-                        HomeScreen(navController = navController)
-                    }
-
-                    // Container Screen
-                    composable(
-                        route = Screen.Container.route + "/{uuid}",
-                        // we are passing the uuid as a parameter to the ContainerScreen
-                        arguments = listOf(
-                            // we are creating uuid, which is a string, as a navArgument
-                            navArgument("uuid") {
-                                type = NavType.StringType
-                                defaultValue = Containers.getRandomUUID().toString()
+                    composable(Screen.Home.route) {
+                        HomeScreen(
+                            navigateToContainer = { uuid ->
+                                navController.navigate(
+                                    Screen.Container.createRoute(
+                                        uuid.toString()
+                                    )
+                                )
                             }
                         )
-                    ) { entry ->
+                    }
+
+                    composable(Screen.Container.createRoute("{uuid}")) { entry ->
+                        // entry contains the arguments passed to the route
                         ContainerScreen(
                             uuid = UUID.fromString(entry.arguments?.getString("uuid")),
-                            navController = navController
+                            navigateToHome = {
+                                navController.navigate(Screen.Home.route)
+                            },
+                            navigateAfterDelete = {
+                                navController.popBackStack()
+                            }
                         )
                     }
                 }

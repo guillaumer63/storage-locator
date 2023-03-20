@@ -20,15 +20,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
-import rg.info.storagelocator.Screen
 import rg.info.storagelocator.data.Containers
 import java.util.UUID
 
 @Composable
-fun HomeFABComponent(navController: NavController) {
+fun HomeFABComponent(navigateToContainer: (UUID) -> Unit) {
 
     val wrongUUID = remember { mutableStateOf(false) }
     // Dialog to show when the scanned UUID is not valid
@@ -51,7 +49,7 @@ fun HomeFABComponent(navController: NavController) {
         contract = ScanContract(),
         onResult = { result ->
             if (result.contents != null && isParsableUUID(result.contents))
-                navController.navigate(Screen.Container.route + "/${result.contents}")
+                navigateToContainer(UUID.fromString(result.contents))
             else
                 wrongUUID.value = true
         }
@@ -65,19 +63,22 @@ fun HomeFABComponent(navController: NavController) {
 
         FloatingActionButton(
             onClick = {
-                scanLauncher.launch(ScanOptions())
-            },
-            content = {
-                Icon(Icons.Filled.QrCodeScanner, contentDescription = "Search")
+                val options = ScanOptions()
+                options.setOrientationLocked(false)
+                    .setBeepEnabled(false)
+                    .setPrompt("Scannez l'UUID du conteneur")
+
+                scanLauncher.launch(options)
             },
             modifier = Modifier.padding(bottom = 10.dp)
-        )
+        ) {
+            Icon(Icons.Filled.QrCodeScanner, contentDescription = "Search")
+        }
+
         ExtendedFloatingActionButton(
             onClick = {
                 // accessing the container screen
-                navController.navigate(
-                    Screen.Container.route + "/${Containers.getRandomUUID()}"
-                )
+                navigateToContainer(Containers.getRandomUUID())
             },
             content = {
                 Icon(Icons.Filled.Add, contentDescription = "Add")

@@ -47,8 +47,12 @@ object Containers {
     }
 
     // Function that returns a container by its UUID, or null
-    fun getContainer(uuid: UUID): Container? {
+    fun getContainer(uuid: UUID): Container {
         return this.containers.firstOrNull { it.getUUID() == uuid }
+            ?: Container(
+                "Nouveau", "", "",
+                this.getRandomUUID()
+            )
     }
 
     // Function that returns a random UUID that is not used by any container

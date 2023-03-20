@@ -16,19 +16,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import rg.info.storagelocator.Screen
 import rg.info.storagelocator.data.Containers
-import rg.info.storagelocator.data.model.Container
 import java.util.UUID
 
 @Composable
-fun ContainerFABComponent(navController: NavController, uuid: UUID) {
+fun ContainerFABComponent(uuid: UUID, onContainerChanged: () -> Unit) {
     val addDialog = remember { mutableStateOf(false) }
-    var container = Containers.getContainer(uuid)
-    if (container == null) {
-        container = Container("Conteneur", "", "", Containers.getRandomUUID())
-    }
+    val container = Containers.getContainer(uuid)
 
     if (addDialog.value) {
         val (newItemName, onNewItemNameChange) = remember { mutableStateOf("") }
@@ -49,7 +43,7 @@ fun ContainerFABComponent(navController: NavController, uuid: UUID) {
                         container.addItem(newItemName)
                         addDialog.value = false
                         // refresh container
-                        navController.navigate(Screen.Container.route + "/${uuid}")
+                        onContainerChanged()
                     },
                     // green color
                     colors = ButtonDefaults.buttonColors(
@@ -80,9 +74,8 @@ fun ContainerFABComponent(navController: NavController, uuid: UUID) {
         onClick = {
             addDialog.value = true
         },
-        content = {
-            Icon(Icons.Filled.Add, contentDescription = "Ajouter")
-        },
         modifier = Modifier.padding(bottom = 10.dp)
-    )
+    ) {
+        Icon(Icons.Filled.Add, contentDescription = "Ajouter")
+    }
 }

@@ -18,25 +18,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import me.saket.swipe.SwipeAction
 import me.saket.swipe.SwipeableActionsBox
-import rg.info.storagelocator.Screen
 import rg.info.storagelocator.data.Containers
-import rg.info.storagelocator.data.model.Container
 import rg.info.storagelocator.ui.theme.Purple40
 import java.util.UUID
 
 @Composable
-fun SwipeableTextComponent(uuid: UUID, item: String, navController: NavController) {
+fun SwipeableTextComponent(uuid: UUID, item: String, onContainerChanged: () -> Unit) {
 
     val editDialog = remember { mutableStateOf(false) }
     val deleteDialog = remember { mutableStateOf(false) }
     val (newItemName, onNewItemNameChange) = remember { mutableStateOf("") }
-    var container = Containers.getContainer(uuid)
-    if (container == null) {
-        container = Container("Conteneur", "", "", Containers.getRandomUUID())
-    }
+    val container = Containers.getContainer(uuid)
 
     val edit = SwipeAction(
         icon = rememberVectorPainter(image = Icons.TwoTone.Edit),
@@ -53,7 +47,7 @@ fun SwipeableTextComponent(uuid: UUID, item: String, navController: NavControlle
     if (editDialog.value) {
         AlertDialog(
             onDismissRequest = { editDialog.value = false },
-            title = { Text("Modifier un objet") },
+            title = { Text("Modifier un conteneur") },
             text = {
                 InputComponent(
                     value = newItemName,
@@ -68,11 +62,10 @@ fun SwipeableTextComponent(uuid: UUID, item: String, navController: NavControlle
                             onNewItemNameChange(item)
                         }
                         container.updateItem(oldItem = item, newItem = newItemName)
-                        editDialog.value = false
                         // refresh container
-                        navController.navigate(Screen.Container.route + "/${uuid}")
+                        onContainerChanged()
+                        editDialog.value = false
                     },
-                    // green color
                     colors = ButtonDefaults.buttonColors(
                         contentColor = Color.White,
                         containerColor = Color.Green.copy(alpha = 0.5f),
@@ -95,8 +88,7 @@ fun SwipeableTextComponent(uuid: UUID, item: String, navController: NavControlle
                     onClick = {
                         container.removeItem(item)
                         deleteDialog.value = false
-                        // refresh container
-                        navController.navigate(Screen.Container.route + "/${uuid}")
+                        onContainerChanged()
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Red
